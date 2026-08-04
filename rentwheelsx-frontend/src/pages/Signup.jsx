@@ -6,7 +6,7 @@ import Logo from '../components/Logo'
 
 export default function Signup() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '' })
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -31,7 +31,7 @@ export default function Signup() {
   const fields = [
     { label: 'Full Name', name: 'name', type: 'text', icon: User, placeholder: 'John Doe' },
     { label: 'Email Address', name: 'email', type: 'email', icon: Mail, placeholder: 'you@example.com' },
-    { label: 'Phone Number', name: 'phone', type: 'tel', icon: Phone, placeholder: '+91 9876543210' },
+    { label: 'Mobile Number', name: 'mobile', type: 'tel', icon: Phone, placeholder: '+91 9876543210' },
   ]
 
   return (

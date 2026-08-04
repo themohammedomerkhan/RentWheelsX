@@ -31,8 +31,8 @@ export default function Dashboard() {
           vehicleAPI.getMine(),
           bookingAPI.getMine(),
         ])
-        setMyVehicles(vRes.data || [])
-        setMyBookings(bRes.data || [])
+        setMyVehicles(vRes.data.data || [])
+        setMyBookings(bRes.data.data || [])
       } catch {
         // silent
       } finally {
@@ -79,7 +79,7 @@ export default function Dashboard() {
         <StatCard icon={DollarSign} label="Paid Bookings" value={paidBookings} color="text-orange-500" bg="bg-orange-50" />
       </div>
 
-      {/* Recent Bookings */}
+      {/* Recent Bookings & Vehicles */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
@@ -98,15 +98,17 @@ export default function Dashboard() {
               {myBookings.slice(0, 4).map(b => (
                 <div key={b.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">{b.vehicle?.name || 'Vehicle'}</p>
-                    <p className="text-xs text-gray-500">{b.rentalType} · {b.duration} {b.rentalType === 'hour' ? 'hrs' : b.rentalType === 'day' ? 'days' : 'months'}</p>
+                    <p className="text-sm font-semibold text-gray-800">{b.vehicleName || 'Vehicle'}</p>
+                    <p className="text-xs text-gray-500">
+                      {b.rentalType} · {b.duration} {b.rentalType === 'HOUR' ? 'hrs' : b.rentalType === 'DAY' ? 'days' : 'months'}
+                    </p>
                   </div>
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                     b.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' :
-                    b.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
+                    b.rideStatus === 'CANCELLED' ? 'bg-red-100 text-red-700' :
                     'bg-yellow-100 text-yellow-700'
                   }`}>
-                    {b.paymentStatus === 'PAID' ? 'Paid' : b.status}
+                    {b.paymentStatus === 'PAID' ? 'Paid' : b.rideStatus}
                   </span>
                 </div>
               ))}
@@ -134,11 +136,25 @@ export default function Dashboard() {
               {myVehicles.slice(0, 4).map(v => (
                 <div key={v.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">{v.name} <span className="text-gray-400 font-normal">· {v.type}</span></p>
-                    <p className="text-xs text-gray-500">₹{v.pricePerHour}/hr · {v.location}</p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {v.name} <span className="text-gray-400 font-normal">· {v.type}</span>
+                    </p>
+                    <p className="text-xs text-gray-500">₹{v.pricePerHour}/hr · {v.currentAddress}</p>
                   </div>
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                     v.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
-                    v.approvalStatus === 'PENDING' ? 'bg-yello **...**
-
-_This response is too long to display in full._
+                    v.approvalStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                    v.approvalStatus === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {v.status === 'ACTIVE' ? 'Active' : v.approvalStatus}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

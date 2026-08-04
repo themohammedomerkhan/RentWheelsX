@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true)
     try {
       const res = await authAPI.login(form)
-      const { token, user } = res.data
+      const { token, user } = res.data.data
       if (user?.otpVerified === false) {
         localStorage.setItem('pendingEmail', form.email)
         navigate('/verify-otp')

@@ -1,0 +1,17 @@
+spring.application.name=RentWheelsX
+server.port=9000
+
+spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect
+
+app.jwt.secret=your_jwt_secret_here
+app.jwt.expiration-ms=86400000
+
+logging.level.com.rentwheelsx=DEBUG

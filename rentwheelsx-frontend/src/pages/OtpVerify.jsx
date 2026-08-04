@@ -48,7 +48,7 @@ export default function OtpVerify() {
     setLoading(true)
     try {
       const res = await authAPI.verifyOtp({ email, otp: code })
-      const { token, user } = res.data
+      const { token, user } = res.data.data
       login(user, token)
       localStorage.removeItem('pendingEmail')
       navigate('/dashboard')
