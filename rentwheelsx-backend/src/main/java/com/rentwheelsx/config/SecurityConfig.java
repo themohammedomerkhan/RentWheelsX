@@ -41,7 +41,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/verify-otp").permitAll()
+                        .requestMatchers(
+                                "/api/auth/signup",
+                                "/api/auth/login",
+                                "/api/auth/verify-otp",
+                                "/api/auth/resend-otp",
+
+                                "/api/auth/forgot-password",
+                                "/api/auth/verify-reset-otp",
+                                "/api/auth/reset-password"
+                        ).permitAll()
+
                         .requestMatchers("/api/vehicles").permitAll()
                         .requestMatchers("/api/vehicles/{id}").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()

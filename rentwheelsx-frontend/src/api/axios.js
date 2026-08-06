@@ -24,11 +24,34 @@ API.interceptors.response.use(
 )
 
 export const authAPI = {
-  signup: (data) => API.post('/auth/signup', data),
-  login: (data) => API.post('/auth/login', data),
-  verifyOtp: (data) => API.post('/auth/verify-otp', data),
-  getProfile: () => API.get('/auth/me'),
-  submitKyc: (data) => API.post('/auth/kyc', data),
+
+  signup: (data) =>
+    API.post("/auth/signup", data),
+
+  login: (data) =>
+    API.post("/auth/login", data),
+
+  verifyOtp: (data) =>
+    API.post("/auth/verify-otp", data),
+
+  resendOtp: (data) =>
+    API.post("/auth/resend-otp", data),
+
+  forgotPassword: (data) =>
+    API.post("/auth/forgot-password", data),
+
+  verifyResetOtp: (data) =>
+    API.post("/auth/verify-reset-otp", data),
+
+  resetPassword: (data) =>
+    API.post("/auth/reset-password", data),
+
+  getProfile: () =>
+    API.get("/auth/me"),
+
+  submitKyc: (data) =>
+    API.post("/auth/kyc", data)
+
 }
 
 export const vehicleAPI = {

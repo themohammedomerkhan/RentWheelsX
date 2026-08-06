@@ -20,6 +20,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -33,9 +34,8 @@ public class AuthService {
             throw new RuntimeException("Mobile number already registered");
         }
 
-        // Generate mock OTP
+        // Generate OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
-        log.info("=== MOCK OTP for {} : {} ===", request.getEmail(), otp);
 
         User user = User.builder()
                 .name(request.getName())
@@ -48,8 +48,39 @@ public class AuthService {
                 .otpExpiresAt(LocalDateTime.now().plusMinutes(10))
                 .build();
 
+        try {
+            userRepository.save(user);
+            emailService.sendOtp(user.getEmail(), otp);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send OTP email. Please try again.");
+        }
+
+        return "User registered successfully! Please check your email for the OTP.";
+    }
+
+    public String resendOtp(ResendOtpRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isVerified()) {
+            throw new RuntimeException("Account already verified");
+        }
+
+        String otp = String.format("%06d", new Random().nextInt(999999));
+
+        user.setOtp(otp);
+        user.setOtpExpiresAt(LocalDateTime.now().plusMinutes(10));
+
         userRepository.save(user);
-        return "User registered! OTP sent to " + request.getEmail() + " (Check server logs for mock OTP)";
+
+        try {
+            emailService.sendOtp(user.getEmail(), otp);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send OTP email.");
+        }
+
+        return "A new OTP has been sent to your email.";
     }
 
     public AuthResponse verifyOtp(OtpVerifyRequest request) {
@@ -113,5 +144,83 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return UserResponse.from(user);
+    }
+
+    public String forgotPassword(ForgotPasswordRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        String otp = String.format("%06d",
+                new Random().nextInt(999999));
+
+        user.setOtp(otp);
+        user.setOtpExpiresAt(LocalDateTime.now().plusMinutes(10));
+        user.setResetOtpVerified(false);
+
+        userRepository.save(user);
+
+        emailService.sendPasswordResetOtp(
+                user.getEmail(),
+                otp
+        );
+
+        return "Password reset OTP sent successfully.";
+    }
+
+    public String verifyResetOtp(
+            VerifyResetOtpRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        if (user.getOtp() == null ||
+                !user.getOtp().equals(request.getOtp())) {
+
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        if (LocalDateTime.now()
+                .isAfter(user.getOtpExpiresAt())) {
+
+            throw new RuntimeException("OTP expired");
+        }
+
+        user.setResetOtpVerified(true);
+        user.setOtp(null);
+        user.setOtpExpiresAt(null);
+
+        userRepository.save(user);
+
+        return "OTP verified successfully.";
+    }
+
+    public String resetPassword(
+            ResetPasswordRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        if (!user.isResetOtpVerified()) {
+
+            throw new RuntimeException(
+                    "Please verify OTP first."
+            );
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        user.setResetOtpVerified(false);
+
+        userRepository.save(user);
+
+        return "Password updated successfully.";
     }
 }

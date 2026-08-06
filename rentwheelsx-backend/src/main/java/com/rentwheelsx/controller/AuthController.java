@@ -50,4 +50,38 @@ public class AuthController {
         UserResponse user = authService.getProfile(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success("Profile retrieved", user));
     }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(
+            @Valid @RequestBody ResendOtpRequest request) {
+
+        return ResponseEntity.ok(authService.resendOtp(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request){
+
+        return ResponseEntity.ok(
+                authService.forgotPassword(request)
+        );
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<String> verifyResetOtp(
+            @Valid @RequestBody VerifyResetOtpRequest request){
+
+        return ResponseEntity.ok(
+                authService.verifyResetOtp(request)
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request){
+
+        return ResponseEntity.ok(
+                authService.resetPassword(request)
+        );
+    }
 }
