@@ -1,18 +1,25 @@
 package com.rentwheelsx.service;
 
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Slf4j
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${resend.api.key}")
+    private String resendApiKey;
+
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    private static final String RESEND_API_URL =
+            "https://api.resend.com/emails";
 
     // ==========================
     // Signup OTP Email
@@ -55,25 +62,58 @@ public class EmailService {
 
         try {
 
-            MimeMessage message = mailSender.createMimeMessage();
-
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(toEmail);
-            helper.setSubject(subject);
-
             String html = buildOtpTemplate(
                     heading,
                     description,
                     otp
             );
 
-            helper.setText(html, true);
+            String jsonBody = """
+                    {
+                        "from": "RentWheelsX <onboarding@resend.dev>",
+                        "to": ["%s"],
+                        "subject": "%s",
+                        "html": "%s"
+                    }
+                    """.formatted(
+                    escapeJson(toEmail),
+                    escapeJson(subject),
+                    escapeJson(html)
+            );
 
-            mailSender.send(message);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(RESEND_API_URL))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
 
-            log.info("OTP email sent successfully to {}", toEmail);
+            HttpResponse<String> response =
+                    httpClient.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
+
+                log.info(
+                        "Email sent successfully to {}",
+                        toEmail
+                );
+
+            } else {
+
+                log.error(
+                        "Resend API failed. Status: {}, Response: {}",
+                        response.statusCode(),
+                        response.body()
+                );
+
+                throw new RuntimeException(
+                        "Failed to send email"
+                );
+            }
 
         } catch (Exception e) {
 
@@ -84,8 +124,24 @@ public class EmailService {
                     e
             );
 
-            throw new RuntimeException("Failed to send email", e);
+            throw new RuntimeException(
+                    "Failed to send email",
+                    e
+            );
         }
+    }
+
+    // ==========================
+    // JSON Escape
+    // ==========================
+    private String escapeJson(String value) {
+
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     // ==========================
@@ -100,14 +156,17 @@ public class EmailService {
         return """
                 <!DOCTYPE html>
                 <html>
+
                 <head>
                     <meta charset="UTF-8">
                 </head>
 
-                <body style="margin:0;
-                             padding:0;
-                             background:#f4f7fb;
-                             font-family:Arial,sans-serif;">
+                <body style="
+                    margin:0;
+                    padding:0;
+                    background:#f4f7fb;
+                    font-family:Arial,sans-serif;
+                ">
 
                 <table width="100%%"
                        cellpadding="0"
@@ -128,15 +187,14 @@ public class EmailService {
                                    ">
 
                                 <tr>
-                                    <td
-                                        style="
-                                            background:#0f172a;
-                                            color:white;
-                                            text-align:center;
-                                            padding:25px;
-                                            font-size:28px;
-                                            font-weight:bold;
-                                        ">
+                                    <td style="
+                                        background:#0f172a;
+                                        color:white;
+                                        text-align:center;
+                                        padding:25px;
+                                        font-size:28px;
+                                        font-weight:bold;
+                                    ">
                                         🚗 RentWheelsX
                                     </td>
                                 </tr>
@@ -148,27 +206,28 @@ public class EmailService {
                                             %s
                                         </h2>
 
-                                        <p style="font-size:16px;color:#444;">
+                                        <p style="
+                                            font-size:16px;
+                                            color:#444;
+                                        ">
                                             %s
                                         </p>
 
-                                        <div
-                                            style="
-                                                margin:35px 0;
-                                                text-align:center;
-                                            ">
+                                        <div style="
+                                            margin:35px 0;
+                                            text-align:center;
+                                        ">
 
-                                            <div
-                                                style="
-                                                    display:inline-block;
-                                                    background:#2563eb;
-                                                    color:white;
-                                                    font-size:36px;
-                                                    letter-spacing:8px;
-                                                    font-weight:bold;
-                                                    padding:18px 35px;
-                                                    border-radius:10px;
-                                                ">
+                                            <div style="
+                                                display:inline-block;
+                                                background:#2563eb;
+                                                color:white;
+                                                font-size:36px;
+                                                letter-spacing:8px;
+                                                font-weight:bold;
+                                                padding:18px 35px;
+                                                border-radius:10px;
+                                            ">
                                                 %s
                                             </div>
 
@@ -186,9 +245,9 @@ public class EmailService {
                                         <hr>
 
                                         <p style="
-                                                color:#888;
-                                                font-size:13px;
-                                                text-align:center;
+                                            color:#888;
+                                            font-size:13px;
+                                            text-align:center;
                                         ">
                                             © 2026 RentWheelsX
                                             <br>
