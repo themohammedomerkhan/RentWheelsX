@@ -1,12 +1,13 @@
 package com.rentwheelsx.service;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -72,7 +73,17 @@ public class EmailService {
 
             mailSender.send(message);
 
-        } catch (MessagingException e) {
+            log.info("OTP email sent successfully to {}", toEmail);
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Failed to send email to {}. Error: {}",
+                    toEmail,
+                    e.getMessage(),
+                    e
+            );
+
             throw new RuntimeException("Failed to send email", e);
         }
     }
