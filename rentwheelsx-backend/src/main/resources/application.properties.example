@@ -1,21 +1,34 @@
 spring.application.name=RentWheelsX
 server.port=9000
 
+# =============================================
+# PostgreSQL Database Configuration
+# =============================================
 spring.datasource.url=YOUR_DATABASE_URL
 spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
 
-spring.mail.username=YOUR_EMAIL@gmail.com
-spring.mail.password=YOUR_APP_PASSWORD
-
-spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-
+# =============================================
+# JPA / Hibernate
+# =============================================
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect
 
+# =============================================
+# Gmail SMTP Configuration
+# =============================================
+spring.mail.username=YOUR_EMAIL@gmail.com
+spring.mail.password=YOUR_APP_PASSWORD
+
+# =============================================
+# JWT Configuration
+# =============================================
 app.jwt.secret=your_jwt_secret_here
 app.jwt.expiration-ms=86400000
 
+# =============================================
+# Logging
+# =============================================
 logging.level.com.rentwheelsx=DEBUG
