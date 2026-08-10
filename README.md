@@ -1,8 +1,8 @@
 # 🚗 RentWheelsX – Vehicle Rental Platform
 
-RentWheelsX is a full-stack vehicle rental platform that enables users to rent cars and bikes from nearby vehicle owners. The application provides secure authentication, vehicle management, booking, payment simulation, and an admin approval workflow.
+RentWheelsX is a full-stack vehicle rental platform that enables users to rent cars and bikes from vehicle owners. The application provides secure authentication, vehicle management, booking, payment simulation, KYC verification, and an admin approval workflow.
 
-The project is built using **Java Spring Boot** for the backend and **React + Vite** for the frontend, following a REST API architecture with JWT-based authentication and PostgreSQL database hosted on Neon.
+The project is built using **Java Spring Boot** for the backend and **React + Vite** for the frontend, following a REST API architecture with **JWT-based authentication** and **PostgreSQL hosted on Neon**.
 
 ---
 
@@ -10,115 +10,118 @@ The project is built using **Java Spring Boot** for the backend and **React + Vi
 
 ## 👤 User Features
 
-* User Registration with Email OTP Verification
-* Resend OTP
-* Secure Login using JWT Authentication
-* Forgot Password
-* Password Reset using Email OTP
-* View Available Vehicles
-* Search & Browse Vehicles
-* Add New Vehicles
-* Manage Own Vehicles
-* Update Vehicle Details
-* Delete Vehicles
-* Activate / Deactivate Vehicle Listings
-* Book Vehicles
-* Payment Simulation
-* View Booking History
-* Owner Contact Details Revealed After Successful Payment
+- User Registration with Email OTP Verification
+- Resend OTP
+- Secure Login using JWT Authentication
+- Forgot Password
+- Password Reset using Email OTP
+- View Available Vehicles
+- Search & Browse Vehicles
+- Add New Vehicles
+- Manage Own Vehicles
+- Update Vehicle Details
+- Delete Vehicles
+- Activate / Deactivate Vehicle Listings
+- Book Vehicles
+- Payment Simulation
+- View Booking History
+- KYC Submission
+- Owner Contact Details Revealed After Successful Payment
 
 ---
 
 ## 🛡️ Admin Features
 
-* Secure Admin Login
-* View All Registered Users
-* View All Vehicles
-* Approve Vehicle Listings
-* Reject Vehicle Listings
-* View All Bookings
-* Monitor Complete Platform Activity
+- Secure Admin Login
+- View All Registered Users
+- View All Vehicles
+- Approve Vehicle Listings
+- Reject Vehicle Listings
+- View All Bookings
+- Monitor Platform Activity
 
 ---
 
-## 🔒 Security Features
+# 🔒 Security Features
 
-* Spring Security
-* JWT Authentication
-* Role-Based Authorization
-* Password Encryption using BCrypt
-* Email OTP Verification
-* Password Reset using OTP
-* Protected REST APIs
-* CORS Configuration
+- Spring Security
+- JWT Authentication
+- Role-Based Authorization
+- BCrypt Password Encryption
+- Email OTP Verification
+- Password Reset using OTP
+- Protected REST APIs
+- CORS Configuration
+- Stateless Authentication
 
 ---
 
-# 🛠 Tech Stack
+# 🛠️ Tech Stack
 
 ## Backend
 
-* Java 17
-* Spring Boot
-* Spring Security
-* Spring Data JPA
-* Hibernate
-* JWT Authentication
-* Maven
-* PostgreSQL
-
----
+- Java 17
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- JWT
+- Maven
+- PostgreSQL
 
 ## Frontend
 
-* React
-* Vite
-* Tailwind CSS
-* Axios
-* React Router DOM
-
----
+- React
+- Vite
+- Tailwind CSS
+- Axios
+- React Router DOM
+- Lucide React
 
 ## Database
 
-* PostgreSQL
-* Neon PostgreSQL
-
----
+- PostgreSQL
+- Neon PostgreSQL
 
 ## Email
 
-* Gmail SMTP
-* HTML Email Templates
-* OTP Verification
-* Password Reset OTP
-
----
+- Mailjet SMTP
+- HTML Email Templates
+- OTP Verification
+- Password Reset OTP
 
 ## Tools
 
-* IntelliJ IDEA
-* Visual Studio Code
-* Postman
-* Git
-* GitHub
+- IntelliJ IDEA
+- Visual Studio Code
+- Postman
+- Git
+- GitHub
 
 ---
 
 # 📂 Project Structure
 
 ```text
-RentWheelsX
+RentWheelsX/
 │
-├── rentwheelsx-backend
-│   ├── src
+├── rentwheelsx-backend/
+│   ├── src/
 │   ├── pom.xml
 │   └── application.properties.example
 │
-├── rentwheelsx-frontend
-│   ├── src
+├── rentwheelsx-frontend/
+│   ├── src/
 │   ├── package.json
 │   └── vite.config.js
+│
+├── screenshots/
+│   ├── login.png
+│   ├── register.png
+│   ├── admin_dashboard.png
+│   ├── user_dashboard.png
+│   ├── bookings.png
+│   └── vehicles.png
 │
 └── README.md
 ```
@@ -127,23 +130,36 @@ RentWheelsX
 
 # ⚙️ Installation
 
-### Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/themohammedomerkhan/RentWheelsX.git
 cd RentWheelsX
 ```
 
-### 🚀 Backend Setup
+---
+
+# 🚀 Backend Setup
+
+Navigate to the backend:
 
 ```bash
 cd rentwheelsx-backend
 ```
 
-Configure your database and email credentials inside:
-`src/main/resources/application.properties`
+Configure your database, JWT, and Mailjet credentials inside:
 
-Use `application.properties.example` as a reference.
+```text
+src/main/resources/application.properties
+```
+
+Use:
+
+```text
+application.properties.example
+```
+
+as a reference.
 
 Run the backend:
 
@@ -151,12 +167,13 @@ Run the backend:
 mvn spring-boot:run
 ```
 
-Backend runs on:
-`http://localhost:9000`
+> The backend is configured for deployment on Render. The local development configuration may use a different port depending on your `application.properties`.
 
 ---
 
-### 💻 Frontend Setup
+# 💻 Frontend Setup
+
+Navigate to the frontend:
 
 ```bash
 cd rentwheelsx-frontend
@@ -174,14 +191,19 @@ Start the frontend:
 npm run dev
 ```
 
-Frontend runs on:
-`http://localhost:5173`
+The Vite development server normally runs on:
+
+```text
+http://localhost:5173
+```
+
+> The deployed frontend uses the deployed Render backend API.
 
 ---
 
-# 🗄 Database Configuration
+# 🗄️ Database Configuration
 
-This project uses PostgreSQL hosted on Neon.
+RentWheelsX uses **PostgreSQL hosted on Neon**.
 
 Configure the following properties inside `application.properties`:
 
@@ -198,49 +220,91 @@ Hibernate automatically creates and updates the required database tables using:
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-> **Note:** Never commit your real database credentials, Gmail App Password, or JWT secret to GitHub.
+> ⚠️ Never commit your real database credentials, Mailjet credentials, or JWT secret to GitHub.
 
 ---
 
 # 📧 Email Configuration
 
-RentWheelsX uses Gmail SMTP for sending OTP emails.
+RentWheelsX uses **Mailjet SMTP** for sending transactional emails.
 
-The application supports:
-* Email verification OTP
-* Resend OTP
-* Forgot password OTP
-* Password reset verification
+The application uses email for:
 
-Configure inside `application.properties`:
+- User registration OTP
+- OTP verification
+- Resending OTP
+- Forgot password OTP
+- Password reset verification
+
+Configure the SMTP settings inside `application.properties`:
 
 ```properties
-spring.mail.username=YOUR_EMAIL@gmail.com
-spring.mail.password=YOUR_APP_PASSWORD
+spring.mail.host=in-v3.mailjet.com
+spring.mail.port=587
+spring.mail.username=YOUR_MAILJET_API_KEY
+spring.mail.password=YOUR_MAILJET_SECRET_KEY
 ```
 
-Use a Gmail App Password instead of your regular Gmail password.
+Use your **Mailjet API Key** as the SMTP username and your **Mailjet Secret Key** as the SMTP password.
+
+> ⚠️ Never commit your Mailjet credentials to GitHub.
 
 ---
 
 # 🔑 Default Admin Account
 
-* **Email:** `admin@rentwheelsx.com`
-* **Password:** `admin123`
+The application includes an admin account for administrative operations.
 
-*For production deployment, use a secure admin password and do not expose credentials publicly.*
+```text
+Email: admin@rentwheelsx.com
+Password: admin123
+```
+
+> ⚠️ For production deployment, use a secure admin password and never expose credentials publicly.
 
 ---
 
 # 📡 REST APIs
 
-The backend exposes REST APIs for:
+The backend provides REST APIs for the following modules:
 
-* **Authentication:** Register, Login, Email OTP Verification, Resend OTP, Forgot Password, Verify Password Reset OTP, Reset Password
-* **User:** User Profile, Dashboard, KYC Submission
-* **Vehicles:** Add, Update, Delete, Activate, Deactivate, View Vehicles, View Own Vehicles
-* **Booking:** Book Vehicle, Payment Simulation, Cancel Booking, Booking History
-* **Admin:** Approve/Reject Vehicle, View Users, View Vehicles, View Bookings
+### Authentication
+
+- Register
+- Login
+- Email OTP Verification
+- Resend OTP
+- Forgot Password
+- Verify Password Reset OTP
+- Reset Password
+- Get User Profile
+- KYC Submission
+
+### Vehicles
+
+- Add Vehicle
+- Update Vehicle
+- Delete Vehicle
+- Activate / Deactivate Vehicle
+- View All Vehicles
+- View Vehicle by ID
+- View Own Vehicles
+
+### Booking
+
+- Create Booking
+- View Booking History
+- View Booking by ID
+- Payment Simulation
+- Cancel Booking
+
+### Admin
+
+- View All Users
+- View All Vehicles
+- Approve Vehicle
+- Reject Vehicle
+- View All Bookings
 
 ---
 
@@ -281,6 +345,9 @@ Payment Simulation
        │
        ▼
 Booking Completed
+       │
+       ▼
+Owner Contact Details Revealed
 ```
 
 ---
@@ -313,64 +380,131 @@ Login with New Password
 
 # 📸 Screenshots
 
-Screenshots will be added after deployment.
+## 🔐 Login
 
-Planned screenshots:
-* Home Page
-* Login Page
-* Signup Page
-* OTP Verification
-* Dashboard
-* Vehicle Listing
-* Vehicle Booking
-* Payment Page
-* Admin Dashboard
+![RentWheelsX Login](screenshots/login.png)
+
+---
+
+## 📝 Registration
+
+![RentWheelsX Registration](screenshots/register.png)
+
+---
+
+## 🛡️ Admin Dashboard
+
+![RentWheelsX Admin Dashboard](screenshots/admin_dashboard.png)
+
+---
+
+## 📊 User Dashboard
+
+![RentWheelsX User Dashboard](screenshots/user_dashboard.png)
+
+---
+
+## 📅 Bookings
+
+![RentWheelsX Bookings](screenshots/bookings.png)
+
+---
+
+## 🚗 Vehicles
+
+![RentWheelsX Vehicles](screenshots/vehicles.png)
 
 ---
 
 # 🧪 Testing
 
-The application has been tested using Postman, Neon PostgreSQL, React Frontend, and Spring Boot REST APIs.
+The application has been tested using:
+
+- Postman
+- Neon PostgreSQL
+- React Frontend
+- Spring Boot REST APIs
 
 Major workflows tested:
-* User Registration & Email OTP Verification
-* User Login & JWT Auth
-* Forgot Password & Password Reset
-* Vehicle Management & Admin Approval
-* Vehicle Booking & Payment Simulation
-* Admin Operations
+
+- User Registration & Email OTP Verification
+- User Login & JWT Authentication
+- Forgot Password & Password Reset
+- Vehicle Management
+- Admin Vehicle Approval / Rejection
+- Vehicle Booking
+- Payment Simulation
+- Booking Cancellation
+- Admin Operations
 
 ---
 
 # 🚀 Deployment
 
-The application will be deployed using:
+The application is deployed using:
 
-* **Frontend:** Vercel
-* **Backend:** Render
-* **Database:** Neon PostgreSQL
+- **Frontend:** Render
+- **Backend:** Render
+- **Database:** Neon PostgreSQL
+- **Email Service:** Mailjet SMTP
 
-**Live Demo:** Coming Soon
+### Live Application
+
+https://rentwheelsx.onrender.com
+
+### Backend API
+
+https://rentwheelsx-backend.onrender.com
+
+---
+
+# 🌐 Deployment Architecture
+
+```text
+                  ┌─────────────────────┐
+                  │      User Browser   │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ React + Vite        │
+                  │ Frontend - Render   │
+                  └──────────┬──────────┘
+                             │ REST API
+                             │ JWT
+                             ▼
+                  ┌─────────────────────┐
+                  │ Spring Boot Backend │
+                  │ Backend - Render    │
+                  └──────┬─────────┬────┘
+                         │         │
+                 ┌───────▼───┐ ┌──▼──────────┐
+                 │ Neon      │ │ Mailjet SMTP│
+                 │ PostgreSQL│ │ Email / OTP │
+                 └───────────┘ └─────────────┘
+```
 
 ---
 
 # 🚀 Future Enhancements
 
-* Real Payment Gateway Integration
-* Google Maps Integration
-* Vehicle Availability Calendar
-* Reviews & Ratings
-* Wishlist
-* Notifications
-* Microservices Architecture
+- Real Payment Gateway Integration
+- Google Maps Integration
+- Vehicle Availability Calendar
+- Reviews & Ratings
+- Wishlist
+- Push Notifications
+- Advanced Search & Filtering
+- Microservices Architecture
 
 ---
 
 # 👨‍💻 Author
 
-**Mohammed Omer Khan**
-* **GitHub:** [https://github.com/themohammedomerkhan](https://github.com/themohammedomerkhan)
-* **LinkedIn:** [https://www.linkedin.com/in/mohammed-omer-khan-workco/](https://www.linkedin.com/in/mohammed-omer-khan-workco/)
+## Mohammed Omer Khan
+
+- **GitHub:** https://github.com/themohammedomerkhan
+- **LinkedIn:** https://www.linkedin.com/in/mohammed-omer-khan-workco/
 
 ---
 
