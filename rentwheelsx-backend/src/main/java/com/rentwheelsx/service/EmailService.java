@@ -8,18 +8,30 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service
 @Slf4j
 public class EmailService {
 
-    @Value("${resend.api.key}")
-    private String resendApiKey;
+    @Value("${mailjet.api.key}")
+    private String mailjetApiKey;
+
+    @Value("${mailjet.secret.key}")
+    private String mailjetSecretKey;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    private static final String RESEND_API_URL =
-            "https://api.resend.com/emails";
+    private static final String MAILJET_API_URL =
+            "https://api.mailjet.com/v3.1/send";
+
+    private static final String FROM_EMAIL =
+            "rentwheelsx@gmail.com";
+
+    private static final String FROM_NAME =
+            "RentWheelsX";
+
 
     // ==========================
     // Signup OTP Email
@@ -35,6 +47,7 @@ public class EmailService {
         );
     }
 
+
     // ==========================
     // Forgot Password OTP Email
     // ==========================
@@ -48,6 +61,7 @@ public class EmailService {
                 otp
         );
     }
+
 
     // ==========================
     // Common Email Sender
@@ -68,25 +82,69 @@ public class EmailService {
                     otp
             );
 
+            /*
+             * Mailjet Send API v3.1
+             */
             String jsonBody = """
                     {
-                        "from": "RentWheelsX <onboarding@resend.dev>",
-                        "to": ["%s"],
-                        "subject": "%s",
-                        "html": "%s"
+                        "Messages": [
+                            {
+                                "From": {
+                                    "Email": "%s",
+                                    "Name": "%s"
+                                },
+                                "To": [
+                                    {
+                                        "Email": "%s"
+                                    }
+                                ],
+                                "Subject": "%s",
+                                "HTMLPart": "%s"
+                            }
+                        ]
                     }
                     """.formatted(
+                    escapeJson(FROM_EMAIL),
+                    escapeJson(FROM_NAME),
                     escapeJson(toEmail),
                     escapeJson(subject),
                     escapeJson(html)
             );
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(RESEND_API_URL))
-                    .header("Authorization", "Bearer " + resendApiKey)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+
+            /*
+             * Mailjet API authentication:
+             *
+             * Username = API Key
+             * Password = Secret Key
+             */
+            String credentials =
+                    mailjetApiKey + ":" + mailjetSecretKey;
+
+            String encodedCredentials =
+                    Base64.getEncoder()
+                            .encodeToString(
+                                    credentials.getBytes(StandardCharsets.UTF_8)
+                            );
+
+
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(MAILJET_API_URL))
+                            .header(
+                                    "Authorization",
+                                    "Basic " + encodedCredentials
+                            )
+                            .header(
+                                    "Content-Type",
+                                    "application/json"
+                            )
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(jsonBody)
+                            )
+                            .build();
+
 
             HttpResponse<String> response =
                     httpClient.send(
@@ -94,18 +152,19 @@ public class EmailService {
                             HttpResponse.BodyHandlers.ofString()
                     );
 
+
             if (response.statusCode() >= 200
                     && response.statusCode() < 300) {
 
                 log.info(
-                        "Email sent successfully to {}",
+                        "Mailjet email sent successfully to {}",
                         toEmail
                 );
 
             } else {
 
                 log.error(
-                        "Resend API failed. Status: {}, Response: {}",
+                        "Mailjet API failed. Status: {}, Response: {}",
                         response.statusCode(),
                         response.body()
                 );
@@ -114,6 +173,7 @@ public class EmailService {
                         "Failed to send email"
                 );
             }
+
 
         } catch (Exception e) {
 
@@ -131,6 +191,7 @@ public class EmailService {
         }
     }
 
+
     // ==========================
     // JSON Escape
     // ==========================
@@ -143,6 +204,7 @@ public class EmailService {
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
     }
+
 
     // ==========================
     // HTML Template

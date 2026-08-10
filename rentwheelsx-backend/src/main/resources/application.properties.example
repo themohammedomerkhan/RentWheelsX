@@ -17,10 +17,11 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
 # =============================================
-# Gmail SMTP Configuration
+# Mailjet Email API Configuration
 # =============================================
-spring.mail.username=YOUR_EMAIL@gmail.com
-spring.mail.password=YOUR_APP_PASSWORD
+mailjet.api.key=${YOUR_MAILJET_API_KEY}
+mailjet.secret.key=${YOUR_MAILJET_SECRET_KEY}
+mailjet.sender.email=${MAILJET_SENDER_EMAIL}
 
 # =============================================
 # JWT Configuration
