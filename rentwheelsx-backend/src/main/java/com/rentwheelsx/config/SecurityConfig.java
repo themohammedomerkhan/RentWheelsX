@@ -35,48 +35,76 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .cors(cors -> cors
+                        .configurationSource(corsConfigurationSource())
+                )
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
+
                         // Public endpoints
                         .requestMatchers(
                                 "/api/auth/signup",
                                 "/api/auth/login",
                                 "/api/auth/verify-otp",
                                 "/api/auth/resend-otp",
-
                                 "/api/auth/forgot-password",
                                 "/api/auth/verify-reset-otp",
                                 "/api/auth/reset-password"
                         ).permitAll()
 
+                        // Public vehicle endpoints
                         .requestMatchers("/api/vehicles").permitAll()
                         .requestMatchers("/api/vehicles/{id}").permitAll()
+
+                        // H2 Console
                         .requestMatchers("/h2-console/**").permitAll()
+
                         // Admin only
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // For H2 console
+
+                .headers(headers ->
+                        headers.frameOptions(frame -> frame.disable())
+                )
+
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider();
+
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
+
         return provider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
+
         return config.getAuthenticationManager();
     }
 
@@ -85,16 +113,36 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+
+        // Allow local frontend during development
+        // and deployed Render frontend in production
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://rentwheelsx.onrender.com"
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+        ));
+
         config.setAllowedHeaders(List.of("*"));
+
         config.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }
