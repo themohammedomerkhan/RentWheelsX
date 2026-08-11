@@ -21,16 +21,16 @@ public class EmailService {
     @Value("${mailjet.secret.key}")
     private String mailjetSecretKey;
 
+    @Value("${mailjet.from.email}")
+    private String fromEmail;
+
+    @Value("${mailjet.from.name:RentWheelsX}")
+    private String fromName;
+
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     private static final String MAILJET_API_URL =
             "https://api.mailjet.com/v3.1/send";
-
-    private static final String FROM_EMAIL =
-            "rentwheelsx@gmail.com";
-
-    private static final String FROM_NAME =
-            "RentWheelsX";
 
 
     // ==========================
@@ -82,6 +82,7 @@ public class EmailService {
                     otp
             );
 
+
             /*
              * Mailjet Send API v3.1
              */
@@ -104,8 +105,8 @@ public class EmailService {
                         ]
                     }
                     """.formatted(
-                    escapeJson(FROM_EMAIL),
-                    escapeJson(FROM_NAME),
+                    escapeJson(fromEmail),
+                    escapeJson(fromName),
                     escapeJson(toEmail),
                     escapeJson(subject),
                     escapeJson(html)
@@ -153,24 +154,35 @@ public class EmailService {
                     );
 
 
+            /*
+             * Check Mailjet response
+             */
             if (response.statusCode() >= 200
                     && response.statusCode() < 300) {
 
                 log.info(
-                        "Mailjet email sent successfully to {}",
-                        toEmail
+                        "Mailjet email sent successfully. To: {}, Status: {}",
+                        toEmail,
+                        response.statusCode()
                 );
 
             } else {
 
+                /*
+                 * VERY IMPORTANT:
+                 * Print the actual Mailjet response.
+                 */
                 log.error(
-                        "Mailjet API failed. Status: {}, Response: {}",
+                        "MAILJET ERROR | Status: {} | Response: {}",
                         response.statusCode(),
                         response.body()
                 );
 
                 throw new RuntimeException(
-                        "Failed to send email"
+                        "Mailjet API failed. HTTP Status: "
+                                + response.statusCode()
+                                + " | Response: "
+                                + response.body()
                 );
             }
 
@@ -178,14 +190,18 @@ public class EmailService {
         } catch (Exception e) {
 
             log.error(
-                    "Failed to send email to {}. Error: {}",
+                    "EMAIL SENDING FAILED | To: {} | Error: {}",
                     toEmail,
                     e.getMessage(),
                     e
             );
 
+            /*
+             * Preserve the actual Mailjet error.
+             */
             throw new RuntimeException(
-                    "Failed to send email",
+                    "Email sending failed: "
+                            + e.getMessage(),
                     e
             );
         }
@@ -236,6 +252,7 @@ public class EmailService {
                        style="padding:40px 0;">
 
                     <tr>
+
                         <td align="center">
 
                             <table width="600"
@@ -249,6 +266,7 @@ public class EmailService {
                                    ">
 
                                 <tr>
+
                                     <td style="
                                         background:#0f172a;
                                         color:white;
@@ -259,9 +277,11 @@ public class EmailService {
                                     ">
                                         🚗 RentWheelsX
                                     </td>
+
                                 </tr>
 
                                 <tr>
+
                                     <td style="padding:40px;">
 
                                         <h2 style="margin-top:0;">
@@ -317,16 +337,19 @@ public class EmailService {
                                         </p>
 
                                     </td>
+
                                 </tr>
 
                             </table>
 
                         </td>
+
                     </tr>
 
                 </table>
 
                 </body>
+
                 </html>
                 """.formatted(
                 heading,
