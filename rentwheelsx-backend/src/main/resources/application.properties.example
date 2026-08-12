@@ -21,7 +21,7 @@ spring.jpa.properties.hibernate.format_sql=true
 # =============================================
 mailjet.api.key=${YOUR_MAILJET_API_KEY}
 mailjet.secret.key=${YOUR_MAILJET_SECRET_KEY}
-mailjet.sender.email=${MAILJET_SENDER_EMAIL}
+mailjet.from.email=${MAILJET_SENDER_EMAIL}
 
 # =============================================
 # JWT Configuration
