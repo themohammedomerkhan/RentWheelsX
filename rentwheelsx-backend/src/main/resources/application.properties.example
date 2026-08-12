@@ -1,5 +1,5 @@
 spring.application.name=RentWheelsX
-server.port=${PORT:9000}
+server.port=${PORT:8080}
 
 # =============================================
 # PostgreSQL Database Configuration

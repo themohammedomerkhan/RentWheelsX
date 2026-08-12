@@ -16,6 +16,6 @@ WORKDIR /app
 
 COPY --from=build /app/target/rentwheelsx-1.0.0.jar app.jar
 
-EXPOSE 10000
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
