@@ -8,34 +8,30 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 @Service
 @Slf4j
 public class EmailService {
 
-    @Value("${mailjet.api.key}")
-    private String mailjetApiKey;
+    @Value("${brevo.api.key}")
+    private String brevoApiKey;
 
-    @Value("${mailjet.secret.key}")
-    private String mailjetSecretKey;
-
-    @Value("${mailjet.from.email}")
+    @Value("${brevo.from.email}")
     private String fromEmail;
 
-    @Value("${mailjet.from.name:RentWheelsX}")
+    @Value("${brevo.from.name:RentWheelsX}")
     private String fromName;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    private static final String MAILJET_API_URL =
-            "https://api.mailjet.com/v3.1/send";
+    private static final String BREVO_API_URL =
+            "https://api.brevo.com/v3/smtp/email";
 
 
     // ==========================
     // Signup OTP Email
     // ==========================
+
     public void sendOtp(String toEmail, String otp) {
 
         sendEmail(
@@ -51,6 +47,7 @@ public class EmailService {
     // ==========================
     // Forgot Password OTP Email
     // ==========================
+
     public void sendPasswordResetOtp(String toEmail, String otp) {
 
         sendEmail(
@@ -66,6 +63,7 @@ public class EmailService {
     // ==========================
     // Common Email Sender
     // ==========================
+
     private void sendEmail(
             String toEmail,
             String subject,
@@ -84,25 +82,21 @@ public class EmailService {
 
 
             /*
-             * Mailjet Send API v3.1
+             * Brevo Transactional Email API
              */
             String jsonBody = """
                     {
-                        "Messages": [
+                        "sender": {
+                            "email": "%s",
+                            "name": "%s"
+                        },
+                        "to": [
                             {
-                                "From": {
-                                    "Email": "%s",
-                                    "Name": "%s"
-                                },
-                                "To": [
-                                    {
-                                        "Email": "%s"
-                                    }
-                                ],
-                                "Subject": "%s",
-                                "HTMLPart": "%s"
+                                "email": "%s"
                             }
-                        ]
+                        ],
+                        "subject": "%s",
+                        "htmlContent": "%s"
                     }
                     """.formatted(
                     escapeJson(fromEmail),
@@ -114,27 +108,20 @@ public class EmailService {
 
 
             /*
-             * Mailjet API authentication:
+             * Brevo API authentication:
              *
-             * Username = API Key
-             * Password = Secret Key
+             * API key is sent through the "api-key" header.
              */
-            String credentials =
-                    mailjetApiKey + ":" + mailjetSecretKey;
-
-            String encodedCredentials =
-                    Base64.getEncoder()
-                            .encodeToString(
-                                    credentials.getBytes(StandardCharsets.UTF_8)
-                            );
-
-
             HttpRequest request =
                     HttpRequest.newBuilder()
-                            .uri(URI.create(MAILJET_API_URL))
+                            .uri(URI.create(BREVO_API_URL))
                             .header(
-                                    "Authorization",
-                                    "Basic " + encodedCredentials
+                                    "api-key",
+                                    brevoApiKey
+                            )
+                            .header(
+                                    "Accept",
+                                    "application/json"
                             )
                             .header(
                                     "Content-Type",
@@ -155,13 +142,13 @@ public class EmailService {
 
 
             /*
-             * Check Mailjet response
+             * Check Brevo response
              */
             if (response.statusCode() >= 200
                     && response.statusCode() < 300) {
 
                 log.info(
-                        "Mailjet email sent successfully. To: {}, Status: {}",
+                        "Brevo email sent successfully. To: {}, Status: {}",
                         toEmail,
                         response.statusCode()
                 );
@@ -169,17 +156,16 @@ public class EmailService {
             } else {
 
                 /*
-                 * VERY IMPORTANT:
-                 * Print the actual Mailjet response.
+                 * Print the actual Brevo response.
                  */
                 log.error(
-                        "MAILJET ERROR | Status: {} | Response: {}",
+                        "BREVO ERROR | Status: {} | Response: {}",
                         response.statusCode(),
                         response.body()
                 );
 
                 throw new RuntimeException(
-                        "Mailjet API failed. HTTP Status: "
+                        "Brevo API failed. HTTP Status: "
                                 + response.statusCode()
                                 + " | Response: "
                                 + response.body()
@@ -196,9 +182,6 @@ public class EmailService {
                     e
             );
 
-            /*
-             * Preserve the actual Mailjet error.
-             */
             throw new RuntimeException(
                     "Email sending failed: "
                             + e.getMessage(),
@@ -211,6 +194,7 @@ public class EmailService {
     // ==========================
     // JSON Escape
     // ==========================
+
     private String escapeJson(String value) {
 
         return value
@@ -225,6 +209,7 @@ public class EmailService {
     // ==========================
     // HTML Template
     // ==========================
+
     private String buildOtpTemplate(
             String heading,
             String description,

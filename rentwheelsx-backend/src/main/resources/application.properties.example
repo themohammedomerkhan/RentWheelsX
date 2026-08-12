@@ -17,11 +17,11 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
 # =============================================
-# Mailjet Email API Configuration
+# Brevo Email API Configuration
 # =============================================
-mailjet.api.key=${YOUR_MAILJET_API_KEY}
-mailjet.secret.key=${YOUR_MAILJET_SECRET_KEY}
-mailjet.from.email=${MAILJET_SENDER_EMAIL}
+brevo.api.key=${BREVO_API_KEY}
+brevo.from.email=${BREVO_FROM_EMAIL}
+brevo.from.name=${BREVO_FROM_NAME:RentWheelsX}
 
 # =============================================
 # JWT Configuration
